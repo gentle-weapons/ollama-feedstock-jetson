@@ -1,6 +1,27 @@
 #!/bin/bash
 set -ex
 
+# ----- Jetson (pre-built binary) path -----
+if [[ "${jetpack_version:-None}" != "None" ]]; then
+    mkdir -p "$PREFIX/bin"
+    if [ -d "bin" ]; then
+        cp -r bin/* "$PREFIX/bin/"
+    else
+        find . -name "ollama" -type f -executable -exec cp {} "$PREFIX/bin/ollama" \;
+    fi
+    chmod +x "$PREFIX/bin/ollama"
+
+    # Install Jetson activation/deactivation scripts
+    mkdir -p "$PREFIX/etc/conda/activate.d"
+    cp "$RECIPE_DIR/activate-jetson.sh" "$PREFIX/etc/conda/activate.d/ollama-jetson.sh"
+
+    mkdir -p "$PREFIX/etc/conda/deactivate.d"
+    cp "$RECIPE_DIR/deactivate-jetson.sh" "$PREFIX/etc/conda/deactivate.d/ollama-jetson.sh"
+
+    exit 0
+fi
+
+# ----- Standard build-from-source path -----
 if [[ "$target_platform" == osx-* ]]; then
     export CXXFLAGS="${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY"
 fi
