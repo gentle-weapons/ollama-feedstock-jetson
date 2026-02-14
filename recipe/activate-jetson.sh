@@ -13,3 +13,7 @@ export OLLAMA_LOGS="${OLLAMA_LOGS:-${CONDA_PREFIX}/var/log/ollama.log}"
 
 # Select the correct CUDA library for the JetPack build
 export OLLAMA_LLM_LIBRARY="${OLLAMA_LLM_LIBRARY:-cuda_v12}"
+
+# Make JetPack CUDA libraries discoverable
+export _OLLAMA_OLD_LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}"
+export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib/ollama${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"

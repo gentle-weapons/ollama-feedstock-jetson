@@ -3,13 +3,14 @@ set -ex
 
 # ----- Jetson (pre-built binary) path -----
 if [[ "${jetpack_version:-None}" != "None" ]]; then
+    # Install the main ollama binary
     mkdir -p "$PREFIX/bin"
-    if [ -d "bin" ]; then
-        cp -r bin/* "$PREFIX/bin/"
-    else
-        find . -name "ollama" -type f -executable -exec cp {} "$PREFIX/bin/ollama" \;
-    fi
+    find ollama-bin -name "ollama" -type f -exec cp {} "$PREFIX/bin/ollama" \;
     chmod +x "$PREFIX/bin/ollama"
+
+    # Install JetPack CUDA libraries
+    mkdir -p "$PREFIX/lib/ollama"
+    cp -r ollama-jetpack-libs/ollama/cuda_jetpack${jetpack_version}/* "$PREFIX/lib/ollama/"
 
     # Install Jetson activation/deactivation scripts
     mkdir -p "$PREFIX/etc/conda/activate.d"
