@@ -36,6 +36,10 @@ build:
       - ${{ "cuda" if cuda }}
       - ${{ "jetpack" if jetpack }}
     down_prioritize_variant: ${{ 1 if cuda == "true" or jetpack == "true" else 0 }}
+  # Disable patchelf for Jetson: the pre-built binaries use $ORIGIN-relative
+  # RPATHs and don't have enough ELF header space for long conda prefix paths.
+  # LD_LIBRARY_PATH in the activate script handles library discovery instead.
+  binary_relocation: ${{ false if jetpack else true }}
   script:
     - if: win
       then: [build.bat]
