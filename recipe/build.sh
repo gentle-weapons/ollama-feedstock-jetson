@@ -3,14 +3,20 @@ set -ex
 
 # ----- Jetson (pre-built binary) path -----
 if [[ "${jetpack_version:-None}" != "None" ]]; then
-    # Install the main ollama binary
-    mkdir -p "$PREFIX/bin"
-    find ollama-bin -name "ollama" -type f -exec cp {} "$PREFIX/bin/ollama" \;
+    # Install the base arm64 package (binary + CPU runner libraries)
+    # The official install extracts the entire archive, which includes
+    # bin/ollama and lib/ollama/ with runner .so files
+    mkdir -p "$PREFIX/bin" "$PREFIX/lib/ollama"
+    cp ollama-bin/bin/ollama "$PREFIX/bin/ollama"
     chmod +x "$PREFIX/bin/ollama"
+    if [ -d "ollama-bin/lib/ollama" ]; then
+        cp -r ollama-bin/lib/ollama/* "$PREFIX/lib/ollama/"
+    fi
 
-    # Install JetPack CUDA libraries
-    mkdir -p "$PREFIX/lib/ollama"
-    cp -r ollama-jetpack-libs/ollama/cuda_jetpack${jetpack_version}/* "$PREFIX/lib/ollama/"
+    # Overlay JetPack CUDA runner libraries (preserving subdirectory structure)
+    # The official install extracts this on top of the base, creating
+    # lib/ollama/cuda_jetpack6/ alongside the CPU runners
+    cp -r ollama-jetpack-libs/lib/ollama/* "$PREFIX/lib/ollama/"
 
     # Install Jetson activation/deactivation scripts
     mkdir -p "$PREFIX/etc/conda/activate.d"

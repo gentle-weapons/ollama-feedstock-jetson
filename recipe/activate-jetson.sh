@@ -11,8 +11,9 @@ export OLLAMA_MODELS="${OLLAMA_MODELS:-${CONDA_PREFIX}/share/ollama/models}"
 # Log file location
 export OLLAMA_LOGS="${OLLAMA_LOGS:-${CONDA_PREFIX}/var/log/ollama.log}"
 
-# Select the correct CUDA library for the JetPack build
-export OLLAMA_LLM_LIBRARY="${OLLAMA_LLM_LIBRARY:-cuda_v12}"
+# Let ollama auto-detect the JetPack CUDA runner from lib/ollama/cuda_jetpack*
+# Only override if the user hasn't set a preference
+export OLLAMA_LLM_LIBRARY="${OLLAMA_LLM_LIBRARY:-cuda_jetpack}"
 
 # Make JetPack CUDA libraries discoverable
 export _OLLAMA_OLD_LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}"
