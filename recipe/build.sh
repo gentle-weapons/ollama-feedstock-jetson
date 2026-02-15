@@ -1,6 +1,34 @@
 #!/bin/bash
 set -ex
 
+# ----- Jetson (pre-built binary) path -----
+if [[ "${jetpack_version:-None}" != "None" ]]; then
+    # Install the base arm64 package (binary + CPU runner libraries)
+    # The official install extracts the entire archive, which includes
+    # bin/ollama and lib/ollama/ with runner .so files
+    mkdir -p "$PREFIX/bin" "$PREFIX/lib/ollama"
+    cp ollama-bin/bin/ollama "$PREFIX/bin/ollama"
+    chmod +x "$PREFIX/bin/ollama"
+    if [ -d "ollama-bin/lib/ollama" ]; then
+        cp -r ollama-bin/lib/ollama/* "$PREFIX/lib/ollama/"
+    fi
+
+    # Overlay JetPack CUDA runner libraries
+    # The JetPack archive extracts as ollama/cuda_jetpack<N>/
+    # This adds the JetPack runner alongside the base runners (cuda_v12, cuda_v13)
+    cp -r ollama-jetpack-libs/ollama/* "$PREFIX/lib/ollama/"
+
+    # Install Jetson activation/deactivation scripts
+    mkdir -p "$PREFIX/etc/conda/activate.d"
+    cp "$RECIPE_DIR/activate-jetson.sh" "$PREFIX/etc/conda/activate.d/ollama-jetson.sh"
+
+    mkdir -p "$PREFIX/etc/conda/deactivate.d"
+    cp "$RECIPE_DIR/deactivate-jetson.sh" "$PREFIX/etc/conda/deactivate.d/ollama-jetson.sh"
+
+    exit 0
+fi
+
+# ----- Standard build-from-source path -----
 if [[ "$target_platform" == osx-* ]]; then
     export CXXFLAGS="${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY"
 fi
