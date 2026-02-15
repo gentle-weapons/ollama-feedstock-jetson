@@ -14,21 +14,9 @@ if [[ "${jetpack_version:-None}" != "None" ]]; then
     fi
 
     # Overlay JetPack CUDA runner libraries
-    # Debug: show what the JetPack archive contains
-    echo "=== JetPack archive contents ==="
-    find ollama-jetpack-libs/ -type f -o -type l | head -50
-    echo "=== end ==="
-
-    # The JetPack archive overlays on top of the base install
-    # Try lib/ollama/ first, fall back to searching for the cuda_jetpack directory
-    if [ -d "ollama-jetpack-libs/lib/ollama" ]; then
-        cp -r ollama-jetpack-libs/lib/ollama/* "$PREFIX/lib/ollama/"
-    elif [ -d "ollama-jetpack-libs/ollama" ]; then
-        cp -r ollama-jetpack-libs/ollama/* "$PREFIX/lib/ollama/"
-    else
-        # Last resort: find and copy any cuda_jetpack directory
-        find ollama-jetpack-libs/ -type d -name "cuda_jetpack*" -exec cp -r {} "$PREFIX/lib/ollama/" \;
-    fi
+    # The JetPack archive extracts as ollama/cuda_jetpack<N>/
+    # This adds the JetPack runner alongside the base runners (cuda_v12, cuda_v13)
+    cp -r ollama-jetpack-libs/ollama/* "$PREFIX/lib/ollama/"
 
     # Install Jetson activation/deactivation scripts
     mkdir -p "$PREFIX/etc/conda/activate.d"
