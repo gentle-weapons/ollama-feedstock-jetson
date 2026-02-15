@@ -39,7 +39,8 @@ build:
   # Disable patchelf for Jetson: the pre-built binaries use $ORIGIN-relative
   # RPATHs and don't have enough ELF header space for long conda prefix paths.
   # LD_LIBRARY_PATH in the activate script handles library discovery instead.
-  binary_relocation: ${{ false if jetpack else true }}
+  dynamic_linking:
+    binary_relocation: ${{ false if jetpack else true }}
   script:
     - if: win
       then: [build.bat]
